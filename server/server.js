@@ -26,10 +26,10 @@ io.on('connection', socket => {
     socket.broadcast.emit("online", id);
 
     // To Send Message across all recipients
-    socket.on('send-message', (message, recipients) => {
+    socket.on('send-message', (msg, recipients) => {
         for (let recipient of recipients) {
             // This broadcasts message to this room, in our case room symbolizes personal id
-            socket.to(recipient).emit('receive-message', message);
+            socket.to(recipient).emit('receive-message', { sender: id, msg });
         }
     })
 

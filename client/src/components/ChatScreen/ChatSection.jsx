@@ -11,8 +11,9 @@ export default function ChatSection({ room = 8888888888 }) {
     const newMsgRef = useRef();
 
     useEffect(() => {
-        function broadcastMessage(msg) {
-            updateChat({ room, sender: 8888888888, msg });
+        function broadcastMessage(message) {
+            const { sender, msg } = message;
+            updateChat({ room, sender, msg });
         }
 
         socket.on('receive-message', broadcastMessage);
