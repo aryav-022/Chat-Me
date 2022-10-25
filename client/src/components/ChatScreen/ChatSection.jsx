@@ -1,21 +1,22 @@
 import Message from './Message';
 import { useEffect, useRef } from 'react';
 import { socket } from "../Dashboard";
+import { useChat } from '../../contexts/ChatProvider';
 
-export default function ChatSection(props) {
+export default function ChatSection({ room = 8888888888 }) {
+    const id = 7011142551;
+    const [chat, updateChat] = useChat();
+
     const chatSectionRef = useRef();
     const newMsgRef = useRef();
-    
+
     useEffect(() => {
         function broadcastMessage(msg) {
-            props.setMessages(messages => {
-                const updatedMessages = [...messages, {sent: false, msg: msg}];
-                return updatedMessages;
-            })
+            updateChat({ room, sender: 8888888888, msg });
         }
 
         socket.on('receive-message', broadcastMessage);
-        
+
         return () => socket.off('receive-message', broadcastMessage);
     })
 
@@ -25,7 +26,7 @@ export default function ChatSection(props) {
     useEffect(() => {
         const messages = chatSectionRef.current.children;
         messages[messages.length - 1].scrollIntoView(false);
-    }, [props.messages])
+    }, [chat])
 
     useEffect(() => {
         const messages = chatSectionRef.current.children;
@@ -35,27 +36,12 @@ export default function ChatSection(props) {
 
     return (
         <ul className='overflow-y-scroll h-chat-section-height max-h-chat-section-height flex flex-col py-2 px-4' ref={chatSectionRef}>
-            <Message sent={true} />
-            <Message />
-            <Message />
-            <Message />
-            {newMsg &&
-                <>
-                    <div className="divider" ref={newMsgRef}>{newMsg.amount} new messages</div>
-                    <Message sent={true} />
-                    <Message />
-                    <Message />
-                    <Message />
-                    <Message />
-                    <Message />
-                    <Message />
-                    <Message sent={true} />
-                </>
-            }
+            {newMsg && <div className="divider" ref={newMsgRef}>{newMsg.amount} new messages</div>}
             {
-                props.messages.map(message => {
-                    return ( <Message sent={message.sent} msg={message.msg} key={props.messages.indexOf(message)} /> )
-                })
+                chat !== undefined && chat[room] !== undefined ? 
+                chat[room].map(message => {
+                    return (<Message sent={message.sender === id} msg={message.msg} />)
+                }) : null
             }
         </ul>
     )

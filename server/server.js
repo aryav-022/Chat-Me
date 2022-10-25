@@ -23,7 +23,7 @@ io.on('connection', socket => {
     socket.join(id);
 
     // Emmiting to all users that this socket user is online now
-    socket.broadcast.emit("online", socket.id);
+    socket.broadcast.emit("online", id);
 
     // To Send Message across all recipients
     socket.on('send-message', (message, recipients) => {

@@ -1,13 +1,15 @@
 import { useRef } from 'react';
 import defaultImage from '../../assets/user.png';
 import { useOnlineUsers } from '../../contexts/OnlineUsersProvider';
+import { useChat } from "../../contexts/ChatProvider";
 
-export default function ChatCard({ current, index }) {
-    const [currentChat, setCurrentChat] = current;
+
+export default function ChatCard({ index }) {
+    const [currentChat, setCurrentChat] = useChat();
     const onlineUsers = useOnlineUsers();
     const imgRef = useRef();
 
-    const active = currentChat === index;    
+    const active = currentChat === index;
     
     function removeAnimation() {
         imgRef.current.classList.remove('animate-pulse');

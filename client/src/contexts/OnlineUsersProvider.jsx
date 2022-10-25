@@ -12,7 +12,6 @@ export default function OnlineUsersProvider({ children }) {
 
     useEffect(() => {
         socket.on('online', id => {
-            console.log(id);
             setOnlineUsers(users => {
                 const updatedUsers = [...users, id];
                 return updatedUsers;

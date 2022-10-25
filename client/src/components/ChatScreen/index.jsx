@@ -1,16 +1,13 @@
-import { useRef, useState } from 'react';
+import { useRef } from 'react';
 import UserCard from '../UserCard';
-import { useChat } from "../../contexts/ChatProvider";
 import dashboardDefault from "../../assets/dashboard_default.svg";
-import chatData from "../../data/chats";
 import ChatSection from './ChatSection';
 import { socket } from "../Dashboard";
+import { useChat } from '../../contexts/ChatProvider';
 
 export default function ChatScreen({ info }) {
-  const [currentChat, setCurrentChat] = useChat();
-  const obj = chatData[currentChat];
-
-  const [messages, setMessages] = useState([{sent: true, msg: "This is a message"}, {sent: true, msg: "This is another message"}]);
+  const obj = {name: "Aryav", members: "you"};
+  const [chat, updateChat] = useChat();
 
   const inputRef = useRef();
 
@@ -22,10 +19,7 @@ export default function ChatScreen({ info }) {
 
     inputRef.current.value = null;
 
-    setMessages(messages => {
-      const updatedMessages = [...messages, {sent: true, msg: msg}];
-      return updatedMessages;
-    })
+    updateChat({room: 8888888888, sender: 7011142551, msg});
   }
 
   function checkEnter(e) {
@@ -38,7 +32,7 @@ export default function ChatScreen({ info }) {
         obj ?
           <>
             <UserCard openDrawer={() => { }} obj={obj} online={false} />
-            <ChatSection messages={messages} setMessages={setMessages} />
+            <ChatSection />
             <div className="form-control w-full">
               <div className="input-group flex">
                 <input type="text" placeholder="Type here" required className="input input-bordered grow" autoFocus ref={inputRef} onKeyDown={checkEnter} />
