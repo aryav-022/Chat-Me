@@ -16,13 +16,13 @@ const io = new Server(server, {
 })
 
 io.on('connection', socket => {
-    socket.emit("online", 2);
-    setTimeout(() => {
-        socket.emit("online", 0);
-    }, 10000);
+    socket.emit("online", socket.id);
     socket.on('send-message', message => {
         socket.broadcast.emit('receive-message', message)
         console.log(message);
+    })
+    socket.on('disconnect', () => {
+        socket.emit("offline", socket.id);
     })
 })
 

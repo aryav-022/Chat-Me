@@ -1,31 +1,11 @@
-import { useRef, useEffect } from 'react';
+import { useRef } from 'react';
 import defaultImage from '../../assets/user.png';
-import { socket } from '../Dashboard';
+import { useOnlineUsers } from '../../contexts/OnlineUsersProvider';
 
 export default function ChatCard({ current, index }) {
     const [currentChat, setCurrentChat] = current;
+    const onlineUsers = useOnlineUsers();
     const imgRef = useRef();
-    const avatarRef = useRef();
-
-    useEffect(() => {
-        socket.on('online', id => {
-            if (id === index) avatarRef.current.classList.add('online');
-        })
-    
-        socket.on('offline', id => {
-            if (id === index) avatarRef.current.classList.remove('online');
-        })
-        
-        return () => {
-            socket.off('online', id => {
-                if (id === index) avatarRef.current.classList.add('online');
-            })
-        
-            socket.off('offline', id => {
-                if (id === index) avatarRef.current.classList.remove('online');
-            })
-        }
-    }, [])
 
     const active = currentChat === index;    
     
@@ -39,7 +19,7 @@ export default function ChatCard({ current, index }) {
 
     return (
         <li className={`bordered ${active ? "bg-primary" : ""}`} onClick={() => setCurrentChat(index)}><a className="py-2">
-            <div className="avatar" ref={avatarRef}>
+            <div className={`avatar ${onlineUsers.includes(index) ? "online" : ""}`}>
                 <div className="w-14 h-14 rounded-full">
                     <img src="https://placeimg.com/192/192/people" className="bg-gray-600 animate-pulse object-contain" onLoad={removeAnimation} ref={imgRef} onError={setDefaultImage} />
                 </div>
