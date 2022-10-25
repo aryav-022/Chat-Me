@@ -17,17 +17,29 @@ const io = new Server(server, {
 
 
 io.on('connection', socket => {
+    // Making a static id
+    const id = socket.handshake.query.id;
+    // Joining a room named that static id
+    socket.join(id);
+
+    // Emmiting to all users that this socket user is online now
     socket.broadcast.emit("online", socket.id);
-    socket.on('send-message', message => {
-        socket.broadcast.emit('receive-message', message);
-        console.log(message);
+
+    // To Send Message across all recipients
+    socket.on('send-message', (message, recipients) => {
+        for (let recipient of recipients) {
+            // This broadcasts message to this room, in our case room symbolizes personal id
+            socket.to(recipient).emit('receive-message', message);
+        }
     })
+
+    // On disconnect, retry to connect and send to other users that this socket user is offline now
     socket.on("disconnect", (reason) => {
         if (reason === "io server disconnect") {
-            // the disconnection was initiated by the server, you need to reconnect manually
+            // Try to reconnect
             socket.connect();
         }
-        io.emit("offline", socket.id);
+        io.emit("offline", id);
     });
 })
 
