@@ -12,6 +12,7 @@ export default function OnlineUsersProvider({ children }) {
 
     useEffect(() => {
         socket.on('online', id => {
+            console.log(id);
             setOnlineUsers(users => {
                 const updatedUsers = [...users, id];
                 return updatedUsers;
@@ -19,27 +20,14 @@ export default function OnlineUsersProvider({ children }) {
         })
 
         socket.on('offline', id => {
+            console.log(id);
             setOnlineUsers(users => {
                 const updatedUsers = users.filter(user => { return user !== id; });
                 return updatedUsers;
             })
         })
 
-        return () => {
-            socket.off('online', id => {
-                setOnlineUsers(users => {
-                    const updatedUsers = [...users, id];
-                    return updatedUsers;
-                })
-            })
-    
-            socket.off('offline', id => {
-                setOnlineUsers(users => {
-                    const updatedUsers = users.filter(user => { return user !== id; });
-                    return updatedUsers;
-                })
-            })
-        }
+        return () => socket.removeAllListeners();
     }, [])
 
     return (

@@ -15,15 +15,20 @@ const io = new Server(server, {
     }
 })
 
+
 io.on('connection', socket => {
-    socket.emit("online", socket.id);
+    socket.broadcast.emit("online", socket.id);
     socket.on('send-message', message => {
-        socket.broadcast.emit('receive-message', message)
+        socket.broadcast.emit('receive-message', message);
         console.log(message);
     })
-    socket.on('disconnect', () => {
-        socket.emit("offline", socket.id);
-    })
+    socket.on("disconnect", (reason) => {
+        if (reason === "io server disconnect") {
+            // the disconnection was initiated by the server, you need to reconnect manually
+            socket.connect();
+        }
+        io.emit("offline", socket.id);
+    });
 })
 
-server.listen(8000, () => {console.log("Server started on http://localhost:8000");})
+server.listen(8000, () => { console.log("Server started on http://localhost:8000"); })
