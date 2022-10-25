@@ -4,7 +4,7 @@ export default function Menu() {
 
     return (
         <ul className="menu">
-            <ChatCard index={0} />
+            <ChatCard index={8888888888} />
             <ChatCard index={1} />
             <ChatCard index={2} />
             <ChatCard index={3} />

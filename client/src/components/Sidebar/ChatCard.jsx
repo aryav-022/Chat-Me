@@ -1,15 +1,14 @@
 import { useRef } from 'react';
 import defaultImage from '../../assets/user.png';
 import { useOnlineUsers } from '../../contexts/OnlineUsersProvider';
-import { useChat } from "../../contexts/ChatProvider";
-
+import { useRoom } from '../../contexts/RoomProvider';
 
 export default function ChatCard({ index }) {
-    const [currentChat, setCurrentChat] = useChat();
+    const [room, setRoom] = useRoom();
     const onlineUsers = useOnlineUsers();
     const imgRef = useRef();
 
-    const active = currentChat === index;
+    const active = room === index;
     
     function removeAnimation() {
         imgRef.current.classList.remove('animate-pulse');
@@ -20,7 +19,7 @@ export default function ChatCard({ index }) {
     }
 
     return (
-        <li className={`bordered ${active ? "bg-primary" : ""}`} onClick={() => setCurrentChat(index)}><a className="py-2">
+        <li className={`bordered ${active ? "bg-primary" : ""}`} onClick={() => setRoom(index)}><a className="py-2">
             <div className={`avatar ${onlineUsers.includes(index) ? "online" : ""}`}>
                 <div className="w-14 h-14 rounded-full">
                     <img src="https://placeimg.com/192/192/people" className="bg-gray-600 animate-pulse object-contain" onLoad={removeAnimation} ref={imgRef} onError={setDefaultImage} />

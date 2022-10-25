@@ -1,6 +1,5 @@
 import { useRef } from "react";
 import Dashboard from "./components/Dashboard";
-import ChatProvider from "./contexts/ChatProvider";
 
 export default function App() {
   const checkboxRef = useRef();
@@ -16,9 +15,7 @@ export default function App() {
         <input id="my-drawer" type="checkbox" className="drawer-toggle" ref={checkboxRef} />
         <div className="drawer-content">
 
-          <ChatProvider>
-            <Dashboard openDrawer={openDrawer} />
-          </ChatProvider>
+          <Dashboard openDrawer={openDrawer} />
 
         </div>
         <div className="drawer-side">

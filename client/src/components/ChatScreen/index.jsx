@@ -4,8 +4,10 @@ import dashboardDefault from "../../assets/dashboard_default.svg";
 import ChatSection from './ChatSection';
 import { socket } from "../Dashboard";
 import { useChat } from '../../contexts/ChatProvider';
+import { useRoom } from '../../contexts/RoomProvider';
 
-export default function ChatScreen({ info }) {
+export default function ChatScreen() {
+  const [room, setRoom] = useRoom();
   const obj = {name: "Aryav", members: "you"};
   const [chat, updateChat] = useChat();
 
@@ -19,7 +21,7 @@ export default function ChatScreen({ info }) {
 
     inputRef.current.value = null;
 
-    updateChat({room: 8888888888, sender: 7011142551, msg});
+    updateChat({room, sender: 7011142551, msg});
   }
 
   function checkEnter(e) {
@@ -29,7 +31,7 @@ export default function ChatScreen({ info }) {
   return (
     <div className="w-chat-screen-width h-screen flex flex-col">
       {
-        obj ?
+        room !== null ?
           <>
             <UserCard openDrawer={() => { }} obj={obj} online={false} />
             <ChatSection />
