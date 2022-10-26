@@ -17,7 +17,7 @@ export default function ChatScreen() {
     const msg = inputRef.current.value;
     if (!msg) return;
 
-    socket.emit('send-message', msg, [7011142551]);
+    socket.emit('send-message', msg, [room]);
 
     inputRef.current.value = null;
 

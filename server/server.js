@@ -3,10 +3,27 @@ const app = express();
 const http = require('http');
 const { Server } = require('socket.io');
 const cors = require('cors');
+const mongoose = require('mongoose');
+const User = require('./models/user');
+
+const PORT = 8000;
+
+mongoose.connect('mongodb://localhost:27017/chat-me', () => console.log('MongoDb Connected!'));
 
 app.use(cors());
 
-const server = http.createServer(app)
+const server = http.createServer(app);
+
+// Register End Point
+app.post('/register', (req, res) => {
+    res.send({msg: 'Hello'});
+})
+
+// Login End Point
+app.post('/login', (req, res) => {
+    res.send({msg: 'Hello'});
+})
+
 
 const io = new Server(server, {
     cors: {
@@ -43,4 +60,4 @@ io.on('connection', socket => {
     });
 })
 
-server.listen(8000, () => { console.log("Server started on http://localhost:8000"); })
+server.listen(PORT, () => { console.log("Server started on http://localhost:8000"); })

@@ -2,9 +2,11 @@ import Message from './Message';
 import { useEffect, useRef } from 'react';
 import { socket } from "../Dashboard";
 import { useChat } from '../../contexts/ChatProvider';
+import { useRoom } from '../../contexts/RoomProvider';
 
-export default function ChatSection({ room = 8888888888 }) {
+export default function ChatSection() {
     const id = 7011142551;
+    const [room, setRoom] = useRoom();
     const [chat, updateChat] = useChat();
 
     const chatSectionRef = useRef();
