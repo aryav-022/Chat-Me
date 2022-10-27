@@ -1,6 +1,6 @@
 import { useRef } from "react";
 import Dashboard from "./components/Dashboard";
-import Authorization from "./components/Authorization";
+import Authentication from "./components/Authentication";
 
 export default function App() {
   const user = null;
@@ -29,7 +29,7 @@ export default function App() {
                 <li><a>Sidebar Item 2</a></li>
               </ul>
             </div>
-          </div> : <Authorization />
+          </div> : <Authentication />
       }
 
     </div>

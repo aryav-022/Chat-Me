@@ -4,7 +4,7 @@ import Verify from "./Verify";
 import Login from "./Login";
 import Fetching from "./Fetching";
 
-export default function Authorization() {
+export default function Authentication() {
     const stepsRef = useRef();
     const sliderRef = useRef();
 
