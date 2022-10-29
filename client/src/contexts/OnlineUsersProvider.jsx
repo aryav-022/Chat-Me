@@ -1,5 +1,5 @@
 import { useContext, createContext, useState, useEffect } from "react";
-import { socket } from "../components/Dashboard";
+import { useSocket } from "./SocketProvider";
 
 const OnlineUsersContext = createContext();
 
@@ -8,25 +8,13 @@ export function useOnlineUsers() {
 }
 
 export default function OnlineUsersProvider({ children }) {
-    const [onlineUsers, setOnlineUsers] = useState([]);
+    const socket = useSocket();
+    const [onlineUsers, setOnlineUsers] = useState(['you']);
 
     useEffect(() => {
-        socket.on('online', id => {
-            setOnlineUsers(users => {
-                const updatedUsers = [...users, id];
-                return updatedUsers;
-            })
-        })
-
-        socket.on('offline', id => {
-            console.log(id);
-            setOnlineUsers(users => {
-                const updatedUsers = users.filter(user => { return user !== id; });
-                return updatedUsers;
-            })
-        })
-
-        return () => socket.removeAllListeners();
+        socket.on('online', setOnlineUsers);
+        
+        return () => socket.off('online', setOnlineUsers);
     }, [])
 
     return (

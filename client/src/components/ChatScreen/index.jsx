@@ -2,14 +2,21 @@ import { useRef } from 'react';
 import UserCard from '../UserCard';
 import dashboardDefault from "../../assets/dashboard_default.svg";
 import ChatSection from './ChatSection';
-import { socket } from "../Dashboard";
+import { useSocket } from "../../contexts/SocketProvider";
 import { useChat } from '../../contexts/ChatProvider';
 import { useRoom } from '../../contexts/RoomProvider';
+import { useToken } from '../../App';
+import { useContacts } from '../../contexts/ContactsProvider';
 
 export default function ChatScreen() {
+  const [token, setToken] = useToken();
+  const { name, email } = JSON.parse(window.atob(token.split('.')[1]));
+
+  const socket = useSocket();
+
   const [room, setRoom] = useRoom();
-  const obj = {name: "Aryav", members: "you"};
   const [chat, updateChat] = useChat();
+  const { contacts } = useContacts();
 
   const inputRef = useRef();
 
@@ -21,19 +28,25 @@ export default function ChatScreen() {
 
     inputRef.current.value = null;
 
-    updateChat({room, sender: 7011142551, msg});
+    updateChat({ room: room, sender: email, msg });
   }
 
   function checkEnter(e) {
     if (e.key === 'Enter' || e.keyCode === 13) sendMessage();
   }
 
+  let title = "Unsaved";
+  if (contacts.find(contact => contact.email === room) && contacts.find(contact => contact.email === room).name) title = contacts.find(contact => contact.email === room).name;
+
+  // let members = room;
+  // if (title === "Unsaved") members = "";
+
   return (
-    <div className="w-chat-screen-width h-screen flex flex-col">
+    <div className="w-chat-screen-width h-screen flex flex-col border-l border-gray-700">
       {
         room !== null ?
           <>
-            <UserCard openDrawer={() => { }} obj={obj} online={false} />
+            <UserCard openDrawer={() => { }} obj={{ name: title, members: room }} online={false} />
             <ChatSection />
             <div className="form-control w-full">
               <div className="input-group flex">

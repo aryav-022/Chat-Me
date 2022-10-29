@@ -1,43 +1,50 @@
 import { useRef } from 'react'
+import { useToken } from '../../App';
 
 export default function Login({ step }) {
-    const phoneNumberRef = useRef();
+    const emailRef = useRef();
     const passwordRef = useRef();
 
-    function login() {
-        const phoneNumber = phoneNumberRef.current.value;
+    const [token, setToken] = useToken();
+
+    function login(e) {
+        const email = emailRef.current.value;
         const password = passwordRef.current.value;
 
-        if (phoneNumber === '' || password == '') return;
+        if (email === '' || password == '') return;
+
+        e.preventDefault();
 
         fetch("http://localhost:8000/login", {
             method: "POST",
-            body: JSON.stringify({
-                phoneNumber: phoneNumber,
-                password: password
-            })
+            body: JSON.stringify({ email, password }),
+            headers: { "Content-type": "application/json; charset=UTF-8" }
         }).then(response => {
             response.json().then(response => {
                 console.log(response);
-                step('next');
+                if (response.code === 201) {
+                    step('next');
+                    localStorage.setItem('chat-me-registered', JSON.stringify(true));
+                    setTimeout(() => setToken(response.token), 5000);
+                }
             });
         })
     }
 
     return (
-        <div className="form-control flex gap-3 items-center h-full w-full justify-center">
+        <form className="form-control flex gap-3 items-center h-full w-full justify-center" onSubmit={login}>
             <label className="input-group flex w-1/3">
-                <span>Phone Number</span>
-                <input type="number" placeholder="8888888888" className="input input-bordered grow" required ref={phoneNumberRef} />
+                <span>Email</span>
+                <input type="email" placeholder="george@email.com" className="input input-bordered grow" required ref={emailRef} />
             </label>
             <label className="input-group flex w-1/3">
                 <span>Password</span>
                 <input type="password" placeholder="****************" className="input input-bordered grow" required ref={passwordRef} />
             </label>
             <div className="btn-group w-1/3">
-                <button className="btn btn-active w-1/2" onClick={login}>Login</button>
-                <button className="btn w-1/2" onClick={() => { step('prev'); step("prev"); }}>Register</button>
+                <button type='submit' className="btn btn-active w-1/2">Login</button>
+                <button className="btn w-1/2" onClick={(e) => { e.preventDefault(); step('prev'); step("prev"); }}>Register</button>
             </div>
-        </div>
+        </form>
     )
 }

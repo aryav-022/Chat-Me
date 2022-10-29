@@ -4,7 +4,7 @@ import animaitonData from '../../lotties/verified.json';
 
 export default function Verify({ step }) {
     const otpRef = useRef();
-    const [verified, setVerified] = useState(false);
+    const [verified, setVerified] = useState(true);
 
     const defaultOptions = {
         loop: true,
@@ -34,7 +34,7 @@ export default function Verify({ step }) {
                         </label>
                         <button className="btn btn-primary w-1/3" onClick={verify}>VERIFY</button>
                         <label className="label py-0">
-                            <span className="label-text">Enter OTP sent to your number</span>
+                            <span className="label-text">Enter OTP sent to your email</span>
                         </label>
                     </> :
                     <Lottie

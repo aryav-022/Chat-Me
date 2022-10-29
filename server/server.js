@@ -4,24 +4,107 @@ const http = require('http');
 const { Server } = require('socket.io');
 const cors = require('cors');
 const mongoose = require('mongoose');
-const User = require('./models/user');
+const Users = require('./models/user');
+const nodemailer = require('nodemailer');
+require('dotenv').config();
+const bcrypt = require('bcryptjs');
+const jwt = require('jsonwebtoken');
 
 const PORT = 8000;
 
 mongoose.connect('mongodb://localhost:27017/chat-me', () => console.log('MongoDb Connected!'));
 
 app.use(cors());
+app.use(express.json());
 
 const server = http.createServer(app);
 
+// function generateOTP() {
+//     const lowerCase = "qwertyuiopasdfghjklzxcvbnm";
+//     const upperCase = "QWERTYUIOPASDFGHJKLZXCVBNM";
+//     const numbers = "98754114578903456789876543";
+
+//     const type = [lowerCase, upperCase, numbers];
+
+//     let otp = "";
+
+//     for (let i = 0; i < 6; i++) {
+//         const from = Math.floor(3 * (Math.random() - 0.0000000000001));
+//         const index = Math.floor(26 * (Math.random() - 0.00000000000001));
+//         otp += type[from][index];
+//     }
+
+//     return otp;
+// }
+
 // Register End Point
-app.post('/register', (req, res) => {
-    res.send({msg: 'Hello'});
+app.post('/register', async (req, res) => {
+    const { name, email, password: plainTextPassword } = req.body;
+
+    const password = await bcrypt.hash(plainTextPassword, 10);
+
+    try {
+        const user = await Users.create({ name, email, password });
+        console.log('User created successfully!');
+        res.status(201).json({ status: 'ok', code: 201 });
+
+        const transporter = nodemailer.createTransport({
+            service: "gmail",
+            auth: {
+                user: process.env.USER,
+                pass: process.env.PASSWORD
+            }
+        });
+
+        console.log(transporter);
+
+        let mailoptions = {
+            from: process.env.USER,
+            to: email,
+            subject: "Chat Me Registeration",
+            text: `Thank You ${name} for registering in Chat Me. Welcome to the world of awesome chats.`
+        }
+
+        transporter.sendMail(mailoptions, (err, success) => {
+            if (err) console.error(err);
+            else {
+                console.log("Email sent succesfully");
+                res.json({ OTP: OTP });
+            };
+        })
+
+    } catch (err) {
+        console.log(err);
+        if (err.code === 11000) res.json({ status: 'error', code: 403, msg: "This email is already in use!" });
+        else res.json({ status: 'error', code: 501, msg: JSON.stringify(err.message) });
+    }
+
+    // const OTP = generateOTP();
 })
 
 // Login End Point
-app.post('/login', (req, res) => {
-    res.send({msg: 'Hello'});
+app.post('/login', async (req, res) => {
+    const { email, password: plainTextPassword } = req.body;
+
+    const user = await Users.findOne({ email }).lean();
+
+    if (!user) res.json({ status: 'error', code: 404, msg: "User not found with given email" });
+
+
+    if (await bcrypt.compare(plainTextPassword, user.password)) {
+        const token = jwt.sign({ name: user.name, email: user.email }, process.env.JWT_SECRET);
+
+        res.status(201).json({ status: 'ok', code: 201, token });
+    }
+
+    else res.json({ status: 'error', code: 501, msg: "Internal Server Error!" });
+})
+
+app.post('/search', async (req, res) => {
+    const { email } = req.body;
+    const user = await Users.findOne({ email }).lean();
+    if (!user) res.json({ status: "error", code: 404, msg: "User not found with this email!" });
+    else res.json({ status: "ok", code: 201, msg: "User Exists with this email", data: { name: user.name, email: user.email } });
 })
 
 
@@ -33,20 +116,38 @@ const io = new Server(server, {
 })
 
 
-io.on('connection', socket => {
+let onlineUsers = new Set();
+
+io.on('connection', async (socket) => {
     // Making a static id
     const id = socket.handshake.query.id;
     // Joining a room named that static id
     socket.join(id);
 
-    // Emmiting to all users that this socket user is online now
-    socket.broadcast.emit("online", id);
+    const user = await Users.findOne({ email: id }).lean();
+    const pendingMessages = user.pendingMessages;
+    pendingMessages.forEach(message => {
+        io.to(id).emit('receive-message', message);
+    })
+    Users.findOneAndUpdate({ email: id }, { pendingMessages: [] });
 
-    // To Send Message across all recipients
-    socket.on('send-message', (msg, recipients) => {
+
+    // Adding id to list of all online users
+    onlineUsers.add(id);
+    // Emmiting updated array
+    io.emit("online", [...onlineUsers]);
+
+    // To send Message across all recipients
+    socket.on('send-message', async (msg, recipients) => {
+        // This broadcasts message to this room, in our case room symbolizes personal id
         for (let recipient of recipients) {
-            // This broadcasts message to this room, in our case room symbolizes personal id
-            socket.to(recipient).emit('receive-message', { sender: id, msg });
+            // Checking if user is online, if not messages are stored in database
+            if (onlineUsers.has(recipient)) socket.to(recipient).emit('receive-message', { room: id, sender: id, msg });
+            else {
+                const user = await Users.findOne({ email: recipient });
+                user.pendingMessages.push({ room: id, sender: id, msg });
+                user.save();
+            }
         }
     })
 
@@ -56,7 +157,8 @@ io.on('connection', socket => {
             // Try to reconnect
             socket.connect();
         }
-        io.emit("offline", id);
+        onlineUsers.delete(id);
+        io.emit("online", [...onlineUsers]);
     });
 })
 

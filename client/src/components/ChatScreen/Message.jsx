@@ -1,4 +1,3 @@
-
 export default function Message(props) {
   const { sent, msg } = props;
 

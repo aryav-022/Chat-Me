@@ -1,5 +1,7 @@
-import { useContext, createContext } from "react";
+import { useContext, createContext, useEffect } from "react";
 import { useLocalStorage } from "../hooks/useLocalStorage";
+import { useToken } from "../App";
+import { useSocket } from "./SocketProvider";
 
 const ChatContext = createContext();
 
@@ -8,8 +10,12 @@ export function useChat() {
 }
 
 export default function ChatProvider({ children }) {
-    const id = 7011142551;
-    const [chat, setChat] = useLocalStorage(id + "-chats", {});
+    const [token, setToken] = useToken();
+    const { name, email } = JSON.parse(window.atob(token.split('.')[1]));
+    
+    const socket = useSocket();
+
+    const [chat, setChat] = useLocalStorage(email + "-chats", {});
 
     /*
         Message Structure
@@ -49,13 +55,23 @@ export default function ChatProvider({ children }) {
         const { room, sender, msg } = message;
 
         setChat(chats => {
-            const updatedChats = { ...chats };
-            if (chats[room]) updatedChats[room] = [...chats[room], { sender: sender, msg: msg }];
+            const updatedChats = {...chats};
+            if (updatedChats[room]) updatedChats[room] = [...updatedChats[room], { sender: sender, msg: msg }];
             else updatedChats[room] = [{ sender: sender, msg: msg }];
             return updatedChats;
         })
     }
 
+    useEffect(() => {
+        function broadcastMessage(message) {
+            const { room, sender, msg } = message;
+            updateChat({ room, sender, msg });
+        }
+
+        socket.on('receive-message', broadcastMessage);
+
+        return () => socket.off('receive-message', broadcastMessage);
+    }, [])
 
 
     return (
