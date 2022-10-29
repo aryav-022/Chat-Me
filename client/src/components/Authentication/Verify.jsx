@@ -17,6 +17,7 @@ export default function Verify({ step }) {
 
     function verify() {
         setVerified(true);
+        localStorage.setItem('chat-me-registered', JSON.stringify(true));
         setTimeout(() => {
             step('next');
         }, 3000);

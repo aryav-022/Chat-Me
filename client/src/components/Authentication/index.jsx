@@ -1,4 +1,4 @@
-import { useRef } from "react";
+import { useRef, useEffect } from "react";
 import Register from "./Register";
 import Verify from "./Verify";
 import Login from "./Login";
@@ -28,7 +28,20 @@ export default function Authentication() {
         }
     }
 
+    let useEffectCalled = false;
 
+    useEffect(() => {
+        if (useEffectCalled) return;
+
+        const registered = JSON.parse(localStorage.getItem('chat-me-registered'));
+        if (registered) {
+            step('next');
+            step('next');
+        }
+
+        useEffectCalled = true;
+    }, [])
+    
     return (
         <div className="flex flex-col items-center justify-around w-screen h-screen pt-32">
 
@@ -51,10 +64,10 @@ export default function Authentication() {
             </div>
 
             <ul className="steps steps-vertical lg:steps-horizontal w-1/3" ref={stepsRef}>
-                <li className="step cursor-pointer before:cursor-default after:transition-all before:transition-all before:duration-500 after:duration-500 step-primary" onClick={() => step(0)}>Register</li>
-                <li className="step cursor-pointer before:cursor-default after:transition-all before:transition-all before:duration-500 after:duration-500" onClick={() => step(1)}>Verify</li>
-                <li className="step cursor-pointer before:cursor-default after:transition-all before:transition-all before:duration-500 after:duration-500" onClick={() => step(2)}>Login</li>
-                <li className="step cursor-pointer before:cursor-default after:transition-all before:transition-all before:duration-500 after:duration-500" onClick={() => step(3)}>Enjoy</li>
+                <li className="step before:cursor-default after:transition-all before:transition-all before:duration-500 after:duration-500 step-primary" onClick={() => step(0)}>Register</li>
+                <li className="step before:cursor-dxefault after:transition-all before:transition-all before:duration-500 after:duration-500" onClick={() => step(1)}>Verify</li>
+                <li className="step before:cursor-default after:transition-all before:transition-all before:duration-500 after:duration-500" onClick={() => step(2)}>Login</li>
+                <li className="step before:cursor-default after:transition-all before:transition-all before:duration-500 after:duration-500" onClick={() => step(3)}>Enjoy</li>
             </ul>
 
         </div>

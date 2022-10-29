@@ -13,19 +13,20 @@ export default function Register({ step }) {
         if (userName === "" || phoneNumber === '' || password == '') return;
 
 
-        fetch("http://localhost:8000/register", {
-            method: "POST",
-            body: JSON.stringify({
-                name: userName,
-                phoneNumber: phoneNumber,
-                password: password
-            })
-        }).then(response => {
-            response.json().then(response => {
-                console.log(response);
-                step('next');
-            });
-        })
+        // fetch("http://localhost:8000/register", {
+        //     method: "POST",
+        //     body: JSON.stringify({
+        //         name: userName,
+        //         phoneNumber: phoneNumber,
+        //         password: password
+        //     })
+        // }).then(response => {
+        //     response.json().then(response => {
+        //         console.log(response);
+        //         step('next');
+        //     });
+        // })
+        step('next');
     }
 
     return (
