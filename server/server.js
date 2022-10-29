@@ -37,26 +37,26 @@ const server = http.createServer(app);
 //     return otp;
 // }
 
+const transporter = nodemailer.createTransport({
+    service: "gmail",
+    auth: {
+        user: process.env.USER,
+        pass: process.env.PASSWORD
+    },
+    tls: {
+        rejectUnauthorized: false
+    }
+});
+
 // Register End Point
 app.post('/register', async (req, res) => {
     const { name, email, password: plainTextPassword } = req.body;
-
+    
     const password = await bcrypt.hash(plainTextPassword, 10);
 
     try {
         const user = await Users.create({ name, email, password });
         console.log('User created successfully!');
-        res.status(201).json({ status: 'ok', code: 201 });
-
-        const transporter = nodemailer.createTransport({
-            service: "gmail",
-            auth: {
-                user: process.env.USER,
-                pass: process.env.PASSWORD
-            }
-        });
-
-        console.log(transporter);
 
         let mailoptions = {
             from: process.env.USER,
@@ -69,10 +69,10 @@ app.post('/register', async (req, res) => {
             if (err) console.error(err);
             else {
                 console.log("Email sent succesfully");
-                res.json({ OTP: OTP });
             };
         })
 
+        res.status(201).json({ status: 'ok', code: 201 });
     } catch (err) {
         console.log(err);
         if (err.code === 11000) res.json({ status: 'error', code: 403, msg: "This email is already in use!" });
