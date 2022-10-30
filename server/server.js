@@ -16,7 +16,10 @@ console.log(process.env.TESTING);
 
 mongoose.connect(process.env.MONGO_DB_URL, () => console.log('MongoDb Connected!'));
 
-app.use(cors());
+app.use(cors({
+    origin: "https://chat-me-client.onrender.com",
+    method: ['GET', 'POST']
+}));
 app.use(express.json());
 
 const server = http.createServer(app);
