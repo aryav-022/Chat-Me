@@ -55,7 +55,7 @@ export default function Menu({ tab, setTab }) {
 
         if (errorRef.current.textContent === "Contact with this email already exists!") return;
 
-        fetch("http://localhost:8000/search", {
+        fetch("https://chat-me.onrender.com:8000/search", {
             method: "POST",
             body: JSON.stringify({ email }),
             headers: { "Content-type": "application/json; charset=UTF-8" }

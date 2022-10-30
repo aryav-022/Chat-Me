@@ -110,7 +110,7 @@ app.post('/search', async (req, res) => {
 
 const io = new Server(server, {
     cors: {
-        origin: ["http://192.168.0.107:5173", "http://localhost:5173"],
+        origin: ["https://chat-me-client.onrender.com"],
         methods: ["GET", "POST"]
     }
 })
@@ -162,4 +162,4 @@ io.on('connection', async (socket) => {
     });
 })
 
-server.listen(PORT, () => { console.log("Server started on http://localhost:8000"); })
+server.listen(PORT, () => { console.log("Server started on https://chat-me.onrender.com"); })
