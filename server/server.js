@@ -82,6 +82,10 @@ app.post('/register', async (req, res) => {
     // const OTP = generateOTP();
 })
 
+app.get("/testing", (req, res) => {
+    res.send("Passed");
+})
+
 // Login End Point
 app.post('/login', async (req, res) => {
     const { email, password: plainTextPassword } = req.body;
