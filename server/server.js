@@ -12,7 +12,7 @@ const jwt = require('jsonwebtoken');
 
 const PORT = 8000;
 
-mongoose.connect('mongodb://localhost:27017/chat-me', () => console.log('MongoDb Connected!'));
+mongoose.connect(process.env.MONGO_DB_URL, () => console.log('MongoDb Connected!'));
 
 app.use(cors());
 app.use(express.json());
