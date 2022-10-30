@@ -12,6 +12,8 @@ const jwt = require('jsonwebtoken');
 
 const PORT = 8000;
 
+console.log(process.env.TESTING);
+
 mongoose.connect(process.env.MONGO_DB_URL, () => console.log('MongoDb Connected!'));
 
 app.use(cors());
