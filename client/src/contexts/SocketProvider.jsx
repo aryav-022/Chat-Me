@@ -13,7 +13,7 @@ export default function SocketProvider({ children }) {
     const { name, email } = JSON.parse(window.atob(token.split('.')[1]));
 
     const socket = io(
-        "https://chat-me.onrender.com:8000",
+        "https://chat-me.onrender.com",
         { query: { id: email } }
     );
 

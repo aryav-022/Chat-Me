@@ -15,7 +15,7 @@ export default function Login({ step }) {
 
         e.preventDefault();
 
-        fetch("https://chat-me.onrender.com:8000/login", {
+        fetch("https://chat-me.onrender.com/login", {
             method: "POST",
             body: JSON.stringify({ email, password }),
             headers: { "Content-type": "application/json; charset=UTF-8" }

@@ -14,7 +14,7 @@ export default function Register({ step }) {
 
         e.preventDefault();
 
-        fetch("https://chat-me.onrender.com:8000/register", {
+        fetch("https://chat-me.onrender.com/register", {
             method: "POST",
             body: JSON.stringify({ name, email, password }),
             headers: { "Content-type": "application/json; charset=UTF-8" }

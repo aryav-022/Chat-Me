@@ -10,7 +10,7 @@ require('dotenv').config();
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 
-const PORT = 8000;
+const PORT = 80;
 
 console.log(process.env.TESTING);
 
