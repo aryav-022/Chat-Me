@@ -6,6 +6,7 @@ import notFound from "../../assets/sidebar_default.svg";
 import { useRef } from "react";
 import { useToken } from "../../App";
 import { useFetch } from "../../api/useFetch";
+import userDefaultImage from "../../assets/user.png";
 
 export default function Menu({ tab, setTab }) {
     const [token, setToken] = useToken();
@@ -25,9 +26,11 @@ export default function Menu({ tab, setTab }) {
         const roomChat = chat[room];
         const roomContact = contacts.find(contact => contact.email === room);
         let name = 'Unsaved';
+        let image = userDefaultImage;
         if (roomContact && roomContact.name) name = roomContact.name;
+        if (roomContact && roomContact.image) image = roomContact.image;
         const lastChat = roomChat[roomChat.length - 1];
-        chatMenu.push(<ChatCard index={room} name={name} img={roomContact.image} lastChat={lastChat.msg} />)
+        chatMenu.push(<ChatCard index={room} name={name} img={image} lastChat={lastChat.msg} />)
     }
 
     async function saveContact(e) {
