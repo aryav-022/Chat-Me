@@ -36,7 +36,12 @@ export default function ChatScreen() {
   }
 
   let title = "Unsaved";
-  if (contacts.find(contact => contact.email === room) && contacts.find(contact => contact.email === room).name) title = contacts.find(contact => contact.email === room).name;
+  let image = "";
+  if (contacts.find(contact => contact.email === room) && contacts.find(contact => contact.email === room).name) {
+    const roomContact = contacts.find(contact => contact.email === room);
+    title = roomContact.name;
+    image = roomContact.image;
+  }
 
   // let members = room;
   // if (title === "Unsaved") members = "";
@@ -46,7 +51,7 @@ export default function ChatScreen() {
       {
         room !== null ?
           <>
-            <UserCard openDrawer={() => { }} obj={{ name: title, members: room }} online={false} />
+            <UserCard openDrawer={() => { }} obj={{ name: title, members: room, image }} online={false} />
             <ChatSection />
             <div className="form-control w-full">
               <div className="input-group flex">
@@ -61,7 +66,7 @@ export default function ChatScreen() {
           </> :
           <>
             <img src={dashboardDefault} alt="" className='h-1/2 w-1/2 mx-auto my-16' />
-            <div className='text-white text-4xl text-center'>Chat Me Web</div>
+            <div className='primary-content text-4xl text-center'>Chat Me Web</div>
             <div className='text-gray-400 mx-auto flex w-fit my-16'>
               <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-6 h-6">
                 <path strokeLinecap="round" strokeLinejoin="round" d="M16.5 10.5V6.75a4.5 4.5 0 10-9 0v3.75m-.75 11.25h10.5a2.25 2.25 0 002.25-2.25v-6.75a2.25 2.25 0 00-2.25-2.25H6.75a2.25 2.25 0 00-2.25 2.25v6.75a2.25 2.25 0 002.25 2.25z" />

@@ -5,6 +5,7 @@ import catImg from "../../assets/cat.svg";
 import notFound from "../../assets/sidebar_default.svg";
 import { useRef } from "react";
 import { useToken } from "../../App";
+import { useFetch } from "../../api/useFetch";
 
 export default function Menu({ tab, setTab }) {
     const [token, setToken] = useToken();
@@ -26,10 +27,10 @@ export default function Menu({ tab, setTab }) {
         let name = 'Unsaved';
         if (roomContact && roomContact.name) name = roomContact.name;
         const lastChat = roomChat[roomChat.length - 1];
-        chatMenu.push(<ChatCard index={room} name={name} img={""} lastChat={lastChat.msg} />)
+        chatMenu.push(<ChatCard index={room} name={name} img={roomContact.image} lastChat={lastChat.msg} />)
     }
 
-    function saveContact(e) {
+    async function saveContact(e) {
         const name = nameRef.current.value;
         const email = emailRef.current.value;
 
@@ -55,29 +56,23 @@ export default function Menu({ tab, setTab }) {
 
         if (errorRef.current.textContent === "Contact with this email already exists!") return;
 
-        fetch("https://chat-me.onrender.com/search", {
-            method: "POST",
-            body: JSON.stringify({ email }),
-            headers: { "Content-type": "application/json; charset=UTF-8" }
-        }).then(response => {
-            response.json().then(response => {
-                if (response.code === 201) {
-                    addContact({ name, email });
-                    errorRef.current.textContent = null;
-                    modalRef.current.checked = false;
-                    nameRef.current.value = "";
-                    emailRef.current.value = "";
-                }
-                else if (response.code === 404) {
-                    errorRef.current.textContent = 'No user with this email';
-                    emailRef.current.value = "";
-                    emailRef.current.focus();    
-                }
-                else {
-                    errorRef.current.textContent = 'Internal Server Error';
-                }
-            });
-        })
+        const response = await useFetch("search", "POST", { email });
+
+        if (response.code === 201) {
+            addContact({ name, email, image: response.data.image });
+            errorRef.current.textContent = null;
+            modalRef.current.checked = false;
+            nameRef.current.value = "";
+            emailRef.current.value = "";
+        }
+        else if (response.code === 404) {
+            errorRef.current.textContent = 'No user with this email';
+            emailRef.current.value = "";
+            emailRef.current.focus();
+        }
+        else {
+            errorRef.current.textContent = 'Internal Server Error';
+        }
     }
 
     const tabContent = [
@@ -90,7 +85,7 @@ export default function Menu({ tab, setTab }) {
             </div>),
         (contacts.length !== 0 ?
             contacts.map(room => {
-                return (<ChatCard index={room.email} name={room.name} lastChat={room.email} setTab={setTab} />)
+                return (<ChatCard index={room.email} name={room.name} img={room.image} lastChat={room.email} setTab={setTab} />)
             }) :
             <div className="h-full flex flex-col justify-center">
                 <img src={notFound} alt="" className="block h-64" />

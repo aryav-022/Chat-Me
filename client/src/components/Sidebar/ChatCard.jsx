@@ -31,7 +31,7 @@ export default function ChatCard({ index, name, img, lastChat, setTab }) {
                 </div>
             </div>
             <div>
-                <div className={`font-bold truncate w-64 ${active ? "text-white" : ""}`}>{name}</div>
+                <div className={`font-bold truncate w-64 ${active ? "primary-content" : ""}`}>{name}</div>
                 <div className={`text-sm ${active ? "" : "opacity-50"} truncate w-64`}>{lastChat}</div>
             </div>
         </a></li>

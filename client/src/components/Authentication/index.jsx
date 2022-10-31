@@ -1,75 +1,55 @@
-import { useRef, useEffect } from "react";
-import Register from "./Register";
-import Verify from "./Verify";
-import Login from "./Login";
-import Fetching from "./Fetching";
+import { useToken } from "../../App";
+import { GoogleLogin } from '@react-oauth/google';
+import { useRef, useState } from "react";
+import { useFetch } from "../../api/useFetch";
+import loadingAnimation from '../../assets/loading.png';
 
 export default function Authentication() {
-    const stepsRef = useRef();
-    const sliderRef = useRef();
+    const [token, setToken] = useToken();
+    const [loading, setLoading] = useState(false);
 
-    let slideNumber = 1;
+    const errorRef = useRef();
 
-    function step(to) {
-        if (to === 'next') {
-            const steps = stepsRef.current.children;
-            steps[slideNumber].classList.add('step-primary');
-            
-            sliderRef.current.children[slideNumber].classList.remove('hidden');
-            sliderRef.current.style.translate = `-${100*slideNumber}%`;
-            slideNumber++;
-        }
-        else if (to === 'prev') {
-            const steps = stepsRef.current.children;
-            steps[slideNumber - 1].classList.remove('step-primary');
-            
-            sliderRef.current.style.translate = `${100*(slideNumber - 2)}%`;
-            slideNumber--;
-        }
-    }
-
-    let useEffectCalled = false;
-
-    useEffect(() => {
-        if (useEffectCalled) return;
-
-        const registered = JSON.parse(localStorage.getItem('chat-me-registered'));
-        if (registered) {
-            step('next');
-            step('next');
-        }
-
-        useEffectCalled = true;
-    }, [])
-    
     return (
-        <div className="flex flex-col items-center justify-around w-screen h-screen pt-32">
-
+        <div>
             <div className="navbar bg-base-100 absolute top-0">
-                <a className="btn btn-ghost normal-case text-xl">Chatme</a>
+                <a className="btn btn-ghost normal-case text-xl">chatme</a>
             </div>
-
-            <div className="container flex items-center justify-between overflow-hidden">
-                {/* {<button className="btn btn-square" disabled={true} onClick={step('prev')}> <kbd>◀︎</kbd> </button>} */}
-
-                <div className="grow row-grid transition-all duration-1000" ref={sliderRef}>
-                    <div><Register step={step} /></div>
-                    <div className="hidden"><Verify step={step} /></div>
-                    <div className="hidden"><Login step={step} /></div>
-                    <div className="hidden"><Fetching step={step} /></div>
+            <div className="flex w-screen h-screen justify-around items-center">
+                <img className="block rounded-full max-h-96 border-4 border-dashed" src="/favicon.jpg" alt="" />
+                <div className="rounded-2xl bg-base-300 p-5 flex flex-col items-center">
+                    <div className="text-3xl mb-8">Sign In with Google</div>
+                    {
+                        loading ?
+                            <img className="block h-12 w-12 rounded-full" src={loadingAnimation} alt="" />
+                            :
+                            <GoogleLogin
+                                onSuccess={async (credentialResponse) => {
+                                    setLoading(true);
+                                    const response = JSON.parse(window.atob(credentialResponse.credential.split('.')[1]));
+                                    const data = {
+                                        name: response.given_name + " " + response.family_name,
+                                        email: response.email,
+                                        image: response.picture
+                                    }
+                                    const serverResponse = await useFetch("login", "POST", data);
+                                    if (serverResponse.code === 201) {
+                                        errorRef.current.textContent = '';
+                                        setToken(serverResponse.token);
+                                    }
+                                    else {
+                                        errorRef.current.textContent = 'Internal Server Error! Try again later.';
+                                    }
+                                    setLoading(false);
+                                }}
+                                onError={() => {
+                                    errorRef.current.textContent = 'Login Failed';
+                                }}
+                            />
+                    }
+                    <div className="text-red-600" ref={errorRef}></div>
                 </div>
-
-                {/* {<button className="btn btn-square" disabled={true} onClick={() => step('next')}> <kbd>▶︎</kbd> </button>} */}
-
             </div>
-
-            <ul className="steps steps-vertical lg:steps-horizontal w-1/3" ref={stepsRef}>
-                <li className="step before:cursor-default after:transition-all before:transition-all before:duration-500 after:duration-500 step-primary" onClick={() => step(0)}>Register</li>
-                <li className="step before:cursor-dxefault after:transition-all before:transition-all before:duration-500 after:duration-500" onClick={() => step(1)}>Verify</li>
-                <li className="step before:cursor-default after:transition-all before:transition-all before:duration-500 after:duration-500" onClick={() => step(2)}>Login</li>
-                <li className="step before:cursor-default after:transition-all before:transition-all before:duration-500 after:duration-500" onClick={() => step(3)}>Enjoy</li>
-            </ul>
-
         </div>
     )
 }

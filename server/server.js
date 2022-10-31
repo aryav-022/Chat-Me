@@ -17,7 +17,7 @@ console.log(process.env.TESTING);
 mongoose.connect(process.env.MONGO_DB_URL, () => console.log('MongoDb Connected!'));
 
 app.use(cors({
-    origin: "https://chat-me-client.onrender.com",
+    origin: process.env.ALLOWED_ORIGIN,
     method: ['GET', 'POST']
 }));
 app.use(express.json());
@@ -53,39 +53,6 @@ const transporter = nodemailer.createTransport({
     }
 });
 
-// Register End Point
-app.post('/register', async (req, res) => {
-    const { name, email, password: plainTextPassword } = req.body;
-    
-    const password = await bcrypt.hash(plainTextPassword, 10);
-
-    try {
-        const user = await Users.create({ name, email, password });
-        console.log('User created successfully!');
-
-        let mailoptions = {
-            from: process.env.USER,
-            to: email,
-            subject: "Chat Me Registeration",
-            text: `Thank You ${name} for registering in Chat Me. Welcome to the world of awesome chats.`
-        }
-
-        transporter.sendMail(mailoptions, (err, success) => {
-            if (err) console.error(err);
-            else {
-                console.log("Email sent succesfully");
-            };
-        })
-
-        res.status(201).json({ status: 'ok', code: 201 });
-    } catch (err) {
-        console.log(err);
-        if (err.code === 11000) res.json({ status: 'error', code: 403, msg: "This email is already in use!" });
-        else res.json({ status: 'error', code: 501, msg: JSON.stringify(err.message) });
-    }
-
-    // const OTP = generateOTP();
-})
 
 app.get("/testing", (req, res) => {
     res.send("Passed");
@@ -93,33 +60,54 @@ app.get("/testing", (req, res) => {
 
 // Login End Point
 app.post('/login', async (req, res) => {
-    const { email, password: plainTextPassword } = req.body;
+    const { name, email, image } = req.body;
 
     const user = await Users.findOne({ email }).lean();
 
-    if (!user) res.json({ status: 'error', code: 404, msg: "User not found with given email" });
+    if (!user) {
+        try {
+            const user = await Users.create({ name, email, image });
+            console.log('User created successfully!');
 
+            const token = jwt.sign({ name, email, image }, process.env.JWT_SECRET);
 
-    if (await bcrypt.compare(plainTextPassword, user.password)) {
-        const token = jwt.sign({ name: user.name, email: user.email }, process.env.JWT_SECRET);
+            let mailoptions = {
+                from: process.env.USER,
+                to: email,
+                subject: "Chat Me Registeration",
+                text: `Thank You ${name} for registering in Chat Me. Welcome to the world of awesome chats.`
+            }
 
+            transporter.sendMail(mailoptions, (err, success) => {
+                if (err) console.error(err);
+                else {
+                    console.log("Email sent succesfully");
+                };
+            })
+
+            res.status(201).json({ status: 'ok', code: 201, token });
+        } catch (err) {
+            console.log(err);
+            res.json({ status: 'error', code: 501, msg: JSON.stringify(err.message) });
+        }
+    }
+    else {
+        const token = jwt.sign({ name, email, image }, process.env.JWT_SECRET);
         res.status(201).json({ status: 'ok', code: 201, token });
     }
-
-    else res.json({ status: 'error', code: 501, msg: "Internal Server Error!" });
 })
 
 app.post('/search', async (req, res) => {
     const { email } = req.body;
     const user = await Users.findOne({ email }).lean();
     if (!user) res.json({ status: "error", code: 404, msg: "User not found with this email!" });
-    else res.json({ status: "ok", code: 201, msg: "User Exists with this email", data: { name: user.name, email: user.email } });
+    else res.json({ status: "ok", code: 201, msg: "User Exists with this email", data: { name: user.name, email: user.email, image: user.image } });
 })
 
 
 const io = new Server(server, {
     cors: {
-        origin: ["https://chat-me-client.onrender.com"],
+        origin: [process.env.ALLOWED_ORIGIN],
         methods: ["GET", "POST"]
     }
 })
@@ -129,46 +117,54 @@ let onlineUsers = new Set();
 
 io.on('connection', async (socket) => {
     // Making a static id
-    const id = socket.handshake.query.id;
-    // Joining a room named that static id
-    socket.join(id);
+    const { id, token } = socket.handshake.query;
 
-    const user = await Users.findOne({ email: id }).lean();
-    const pendingMessages = user.pendingMessages;
-    pendingMessages.forEach(message => {
-        io.to(id).emit('receive-message', message);
-    })
-    Users.findOneAndUpdate({ email: id }, { pendingMessages: [] });
+    try {
+        const decode = jwt.verify(token, process.env.JWT_SECRET);
+
+        // Joining a room named that static id
+        socket.join(id);
+
+        const user = await Users.findOne({ email: id }).lean();
+        const pendingMessages = user.pendingMessages;
+        pendingMessages.forEach(message => {
+            io.to(id).emit('receive-message', message);
+        })
+        Users.findOneAndUpdate({ email: id }, { pendingMessages: [] });
 
 
-    // Adding id to list of all online users
-    onlineUsers.add(id);
-    // Emmiting updated array
-    io.emit("online", [...onlineUsers]);
-
-    // To send Message across all recipients
-    socket.on('send-message', async (msg, recipients) => {
-        // This broadcasts message to this room, in our case room symbolizes personal id
-        for (let recipient of recipients) {
-            // Checking if user is online, if not messages are stored in database
-            if (onlineUsers.has(recipient)) socket.to(recipient).emit('receive-message', { room: id, sender: id, msg });
-            else {
-                const user = await Users.findOne({ email: recipient });
-                user.pendingMessages.push({ room: id, sender: id, msg });
-                user.save();
-            }
-        }
-    })
-
-    // On disconnect, retry to connect and send to other users that this socket user is offline now
-    socket.on("disconnect", (reason) => {
-        if (reason === "io server disconnect") {
-            // Try to reconnect
-            socket.connect();
-        }
-        onlineUsers.delete(id);
+        // Adding id to list of all online users
+        onlineUsers.add(id);
+        // Emmiting updated array
         io.emit("online", [...onlineUsers]);
-    });
+
+        // To send Message across all recipients
+        socket.on('send-message', async (msg, recipients) => {
+            // This broadcasts message to this room, in our case room symbolizes personal id
+            for (let recipient of recipients) {
+                // Checking if user is online, if not messages are stored in database
+                if (onlineUsers.has(recipient)) socket.to(recipient).emit('receive-message', { room: id, sender: id, msg });
+                else {
+                    const user = await Users.findOne({ email: recipient });
+                    user.pendingMessages.push({ room: id, sender: id, msg });
+                    user.save();
+                }
+            }
+        })
+
+        // On disconnect, retry to connect and send to other users that this socket user is offline now
+        socket.on("disconnect", (reason) => {
+            if (reason === "io server disconnect") {
+                // Try to reconnect
+                socket.connect();
+            }
+            onlineUsers.delete(id);
+            io.emit("online", [...onlineUsers]);
+        });
+    } catch (err) {
+        console.error(err);
+        socket.disconnect();
+    }
 })
 
 server.listen(PORT, () => { console.log("Server started on https://chat-me.onrender.com"); })
