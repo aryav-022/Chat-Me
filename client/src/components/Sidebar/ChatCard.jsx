@@ -24,7 +24,7 @@ export default function ChatCard({ index, name, img, lastChat, setTab }) {
     }
 
     return (
-        <li className={`bordered ${active ? "bg-primary" : ""}`} onClick={openRoom}><a className="py-2">
+        <li className={`bordered ${active ? "bg-primary text-primary-content" : ""}`} onClick={openRoom}><a className="py-2">
             <div className={`avatar ${onlineUsers.includes(index) ? "online" : ""}`}>
                 <div className="w-14 h-14 rounded-full">
                     <img src={img} className="bg-gray-600 animate-pulse object-contain" onLoad={removeAnimation} ref={imgRef} onError={setDefaultImage} />

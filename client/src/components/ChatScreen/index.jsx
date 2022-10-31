@@ -7,6 +7,7 @@ import { useChat } from '../../contexts/ChatProvider';
 import { useRoom } from '../../contexts/RoomProvider';
 import { useToken } from '../../App';
 import { useContacts } from '../../contexts/ContactsProvider';
+import userDefaultImage from "../../assets/user.png";
 
 export default function ChatScreen() {
   const [token, setToken] = useToken();
@@ -36,12 +37,10 @@ export default function ChatScreen() {
   }
 
   let title = "Unsaved";
-  let image = "";
-  if (contacts.find(contact => contact.email === room) && contacts.find(contact => contact.email === room).name) {
-    const roomContact = contacts.find(contact => contact.email === room);
-    title = roomContact.name;
-    image = roomContact.image;
-  }
+  let image = userDefaultImage;
+  const roomContact = contacts.find(contact => contact.email === room);
+  if (roomContact && roomContact.name) title = roomContact.name;
+  if (roomContact && roomContact.name) image = roomContact.image;
 
   // let members = room;
   // if (title === "Unsaved") members = "";
