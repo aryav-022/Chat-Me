@@ -32,3 +32,7 @@
     display: grid;
     grid-template-columns: repeat(4, 100%);
 }
+
+.bg-recieved-message {
+    background-color: #1f2937;
+}
