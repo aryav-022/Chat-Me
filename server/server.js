@@ -125,12 +125,18 @@ io.on('connection', async (socket) => {
         // Joining a room named that static id
         socket.join(id);
 
-        const user = await Users.findOne({ email: id }).lean();
+        const user = await Users.findOne({ email: id });
         const pendingMessages = user.pendingMessages;
-        pendingMessages.forEach(message => {
-            io.to(id).emit('receive-message', message);
-        })
-        Users.findOneAndUpdate({ email: id }, { pendingMessages: [] });
+
+        const numberOfMessages = pendingMessages.length;
+
+        for (let i = 0; i < numberOfMessages; i++) {
+            io.to(id).emit('receive-message', pendingMessages[i]);
+            if (i == numberOfMessages - 1) {
+                user.pendingMessages = [];
+                await user.save();
+            };
+        }
 
 
         // Adding id to list of all online users
