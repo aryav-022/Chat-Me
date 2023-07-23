@@ -7,9 +7,15 @@ import RoomProvider from "../../contexts/RoomProvider";
 import ContactsProvider from "../../contexts/ContactsProvider";
 import { useRef } from "react";
 
+
+/*
+    Parent Page to main app
+    Wraps everything with various Context Providers
+*/
 export default function Dashboard() {
     const checkboxRef = useRef();
 
+    // Sets "checked = true" for checkbox using checkboxRef
     function openDrawer() {
         checkboxRef.current.checked = true;
     }

@@ -8,6 +8,19 @@ export function useContacts() {
     return useContext(ContactsContext);
 }
 
+/*
+    Flow to add a contact
+        1. User saves a contact
+        2. Contact is added to contacts using addContact
+
+    Flow to delete a contact
+        1. User deletes a contact
+        2. Contact is deleted from contacts using deleteContact
+
+    Flow to display contacts
+        1. User opens the contacts page
+        2. Contacts are displayed using contacts
+*/
 export default function ContactsProvider({ children }) {
     const [token, setToken] = useToken();
     const { name, email } = JSON.parse(window.atob(token.split('.')[1]));

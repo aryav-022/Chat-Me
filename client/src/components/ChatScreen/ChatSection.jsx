@@ -5,16 +5,23 @@ import { useRoom } from '../../contexts/RoomProvider';
 import { useToken } from '../../App';
 
 export default function ChatSection() {
+    // Decode Token
     const [token, setToken] = useToken();
     const { name, email } = JSON.parse(window.atob(token.split('.')[1]));
 
+    // Get Room Information
     const [room, setRoom] = useRoom();
+    // Get Chats
     const [chat, updateChat] = useChat();
 
     const chatSectionRef = useRef();
 
+    // Future Feature for Unread Messages
     let newMsg = { amount: 0 };
 
+    // Rendering whenever chat is updated
+    // For auto scroll only
+    // Chat is updated using state variable's render only
     useEffect(() => {
         const messages = chatSectionRef.current.children;
         if (messages && messages[messages.length - 1]) messages[messages.length - 1].scrollIntoView(false);

@@ -6,6 +6,7 @@ export function useRoom() {
     return useContext(RoomContext);
 }
 
+// Just to keep track of the room aka the user you are chatting with
 export default function RoomProvider({ children }) {
     const [room, setRoom] = useState(null);
 

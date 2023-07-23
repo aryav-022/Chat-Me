@@ -9,10 +9,19 @@ export function useChat() {
     return useContext(ChatContext);
 }
 
+/*
+    Flow
+    1. User sends a message
+    2. Message is added to chat using updateChat
+    3. Message is sent to server
+    4. Server emits a 'receive-message' event to all users except the sender
+    5. Client receives the event and updates the chat
+*/
 export default function ChatProvider({ children }) {
     const [token, setToken] = useToken();
     const { name, email } = JSON.parse(window.atob(token.split('.')[1]));
     
+    // Socket Instance
     const socket = useSocket();
 
     const [chat, setChat] = useLocalStorage(email + "-chats", {});
@@ -51,6 +60,7 @@ export default function ChatProvider({ children }) {
         }
     */
 
+    // Adds message to chat
     function updateChat(message) {
         const { room, sender, msg } = message;
 
@@ -62,12 +72,16 @@ export default function ChatProvider({ children }) {
         })
     }
 
+    // Binding socket events
+    // When a message is received, update chat
+    // useEffect is used to bind the event only once
     useEffect(() => {
         function broadcastMessage(message) {
             const { room, sender, msg } = message;
             updateChat({ room, sender, msg });
         }
 
+        // This event is emitted by server when a message is received
         socket.on('receive-message', broadcastMessage);
 
         return () => socket.off('receive-message', broadcastMessage);
@@ -75,6 +89,8 @@ export default function ChatProvider({ children }) {
 
 
     return (
+        // Giving access to chat and updateChat to all children
+        // As when a message is sent, chat needs to be updated and no server event is emitted
         <ChatContext.Provider value={[chat, updateChat]}>
             {children}
         </ChatContext.Provider>

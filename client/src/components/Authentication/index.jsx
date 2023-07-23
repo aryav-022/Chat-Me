@@ -4,6 +4,13 @@ import { useRef, useState } from "react";
 import { useFetch } from "../../api/useFetch";
 import loadingAnimation from '../../assets/loading.png';
 
+
+/*
+    Auth page
+        loading state: loading image
+        auth state: Google Auth Screen
+            when trying to login set loading var to true (go to loading state)
+*/
 export default function Authentication() {
     const [token, setToken] = useToken();
     const [loading, setLoading] = useState(false);
@@ -21,8 +28,10 @@ export default function Authentication() {
                     <div className="text-3xl mb-8">Sign In with Google</div>
                     {
                         loading ?
+                            // Loading state - show basic image
                             <img className="block h-12 w-12 rounded-full" src={loadingAnimation} alt="" />
                             :
+                            // Auth State - show Google Auth screen
                             <GoogleLogin
                                 onSuccess={async (credentialResponse) => {
                                     setLoading(true);

@@ -1,8 +1,10 @@
 import { useRef } from "react";
 
+// Card for individual contacts, chats, top bars
 export default function UserCard({ openDrawer, obj, online }) {
     const imgRef = useRef();
 
+    // To remove skeleton animation after image is loaded
     function removeAnimation() {
         imgRef.current.classList.remove('animate-pulse');
     }
@@ -24,7 +26,10 @@ export default function UserCard({ openDrawer, obj, online }) {
     )
 }
 
+// Default Props
+// To avoid errors caused by undefined if value is not given
 UserCard.defaultProps = {
+    openDrawer: () => {},
     online: false,
     obj: null
 }
