@@ -5,7 +5,6 @@ const { Server } = require('socket.io');
 const cors = require('cors');
 const mongoose = require('mongoose');
 const Users = require('./models/user');
-const nodemailer = require('nodemailer');
 require('dotenv').config();
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
@@ -24,36 +23,6 @@ app.use(express.json());
 
 const server = http.createServer(app);
 
-// function generateOTP() {
-//     const lowerCase = "qwertyuiopasdfghjklzxcvbnm";
-//     const upperCase = "QWERTYUIOPASDFGHJKLZXCVBNM";
-//     const numbers = "98754114578903456789876543";
-
-//     const type = [lowerCase, upperCase, numbers];
-
-//     let otp = "";
-
-//     for (let i = 0; i < 6; i++) {
-//         const from = Math.floor(3 * (Math.random() - 0.0000000000001));
-//         const index = Math.floor(26 * (Math.random() - 0.00000000000001));
-//         otp += type[from][index];
-//     }
-
-//     return otp;
-// }
-
-const transporter = nodemailer.createTransport({
-    service: "gmail",
-    auth: {
-        user: process.env.USER,
-        pass: process.env.PASSWORD
-    },
-    tls: {
-        rejectUnauthorized: false
-    }
-});
-
-
 app.get("/testing", (req, res) => {
     res.send("Passed");
 })
@@ -70,20 +39,6 @@ app.post('/login', async (req, res) => {
             console.log('User created successfully!');
 
             const token = jwt.sign({ name, email, image }, process.env.JWT_SECRET);
-
-            let mailoptions = {
-                from: process.env.USER,
-                to: email,
-                subject: "Chat Me Registeration",
-                text: `Thank You ${name} for registering in Chat Me. Welcome to the world of awesome chats.`
-            }
-
-            transporter.sendMail(mailoptions, (err, success) => {
-                if (err) console.error(err);
-                else {
-                    console.log("Email sent succesfully");
-                };
-            })
 
             res.status(201).json({ status: 'ok', code: 201, token });
         } catch (err) {
