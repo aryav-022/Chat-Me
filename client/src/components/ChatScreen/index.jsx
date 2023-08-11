@@ -52,7 +52,7 @@ export default function ChatScreen() {
 
   if (room !== null) {
     return (
-      <div className="flex-grow h-screen flex flex-col border-l bg-base-100 border-gray-700 max-sm:absolute max-sm:top-0 max-sm:left-0 max-sm:w-screen max-sm:z-30">
+      <div className="w-chat-screen-width h-screen flex flex-col border-l bg-base-100 border-gray-700 max-sm:absolute max-sm:top-0 max-sm:left-0 max-sm:w-screen max-sm:z-30">
         <UserCard obj={{ name: title, members: room, image }} online={false} /> {/* Top bar of chat */}
         <ChatSection /> {/* Main section - shows chats */}
         {/* Input Area */}
@@ -72,7 +72,7 @@ export default function ChatScreen() {
   }
   else {
     return (
-      <div className="flex-grow h-screen flex flex-col border-l border-gray-700 max-sm:absolute max-sm:top-0 max-sm:left-0 max-sm:w-screen max-sm:-z-10">
+      <div className="w-chat-screen-width h-screen flex flex-col border-l border-gray-700 max-sm:absolute max-sm:top-0 max-sm:left-0 max-sm:w-screen max-sm:-z-10">
         <img src={dashboardDefault} alt="" className='h-1/2 w-1/2 mx-auto my-16' />
         <div className='primary-content text-4xl text-center'>Chat Me Web</div>
         <div className='text-gray-400 mx-auto flex w-fit my-16'>

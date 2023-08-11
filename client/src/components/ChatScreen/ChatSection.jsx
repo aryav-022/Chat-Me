@@ -28,11 +28,11 @@ export default function ChatSection() {
     }, [chat])
     
     return (
-        <ul className='overflow-y-scroll flex-grow flex flex-col py-2 px-4' ref={chatSectionRef}>
+        <ul className='overflow-y-scroll h-chat-section-height max-h-chat-section-height flex flex-col py-2 px-4' ref={chatSectionRef}>
             {
                 chat !== undefined && chat[room] !== undefined ?
-                    chat[room].map((message, index) => {
-                        return (<Message sent={message.sender === email} msg={message.msg} key={index} />)
+                    chat[room].map(message => {
+                        return (<Message sent={message.sender === email} msg={message.msg} />)
                     }) : null
             }
         </ul>
