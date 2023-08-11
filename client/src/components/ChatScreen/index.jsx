@@ -57,7 +57,7 @@ export default function ChatScreen() {
         <ChatSection /> {/* Main section - shows chats */}
         {/* Input Area */}
         {/* Extra Elements are to use DaisyUI */}
-        <div className="form-control w-full">
+        <div className="form-control w-full sticky bottom-0">
           <div className="input-group flex">
             <input type="text" placeholder="Type here" required className="input input-bordered grow" autoFocus ref={inputRef} onKeyDown={checkEnter} /> {/* Checks if user pressed enter - for send message on enter */}
             <button className="btn btn-square" onClick={sendMessage}> {/* message is sent when pressed */}
