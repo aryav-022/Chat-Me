@@ -1,12 +1,21 @@
 import { useRef } from "react";
+import { useRoom } from "../contexts/RoomProvider";
 
 // Card for individual contacts, chats, top bars
 export default function UserCard({ openDrawer, obj, online }) {
     const imgRef = useRef();
+    const [room, setRoom] = useRoom();
 
     // To remove skeleton animation after image is loaded
     function removeAnimation() {
         imgRef.current.classList.remove('animate-pulse');
+    }
+
+    if (openDrawer === null) {
+        openDrawer = () => {
+            console.log("Drawer Opened");
+            setRoom(null);
+        };
     }
 
     return (
@@ -29,7 +38,7 @@ export default function UserCard({ openDrawer, obj, online }) {
 // Default Props
 // To avoid errors caused by undefined if value is not given
 UserCard.defaultProps = {
-    openDrawer: () => {},
+    openDrawer: null,
     online: false,
     obj: null
 }

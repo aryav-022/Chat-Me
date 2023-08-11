@@ -50,39 +50,38 @@ export default function ChatScreen() {
   if (roomContact && roomContact.name) title = roomContact.name; // contact is found and it has a name property -> change title
   if (roomContact && roomContact.name) image = roomContact.image; // contact is found and it has a image property -> change image
 
-  return (
-    <div className="w-chat-screen-width h-screen flex flex-col border-l border-gray-700">
-      {
-        room !== null ?
-          // If room is selected
-          <>
-            <UserCard obj={{ name: title, members: room, image }} online={false} /> {/* Top bar of chat */}
-            <ChatSection /> {/* Main section - shows chats */}
-            {/* Input Area */}
-            {/* Extra Elements are to use DaisyUI */}
-            <div className="form-control w-full">
-              <div className="input-group flex">
-                <input type="text" placeholder="Type here" required className="input input-bordered grow" autoFocus ref={inputRef} onKeyDown={checkEnter} /> {/* Checks if user pressed enter - for send message on enter */}
-                <button className="btn btn-square" onClick={sendMessage}> {/* message is sent when pressed */}
-                  <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-6 h-6 rotate-[-30deg]">
-                    <path strokeLinecap="round" strokeLinejoin="round" d="M6 12L3.269 3.126A59.768 59.768 0 0121.485 12 59.77 59.77 0 013.27 20.876L5.999 12zm0 0h7.5" />
-                  </svg>
-                </button>
-              </div>
-            </div>
-          </> :
-          // Default Screen when no room is selected
-          <>
-            <img src={dashboardDefault} alt="" className='h-1/2 w-1/2 mx-auto my-16' />
-            <div className='primary-content text-4xl text-center'>Chat Me Web</div>
-            <div className='text-gray-400 mx-auto flex w-fit my-16'>
-              <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-6 h-6">
-                <path strokeLinecap="round" strokeLinejoin="round" d="M16.5 10.5V6.75a4.5 4.5 0 10-9 0v3.75m-.75 11.25h10.5a2.25 2.25 0 002.25-2.25v-6.75a2.25 2.25 0 00-2.25-2.25H6.75a2.25 2.25 0 00-2.25 2.25v6.75a2.25 2.25 0 002.25 2.25z" />
+  if (room !== null) {
+    return (
+      <div className="w-chat-screen-width h-screen flex flex-col border-l bg-base-100 border-gray-700 max-sm:absolute max-sm:top-0 max-sm:left-0 max-sm:w-screen max-sm:z-30">
+        <UserCard obj={{ name: title, members: room, image }} online={false} /> {/* Top bar of chat */}
+        <ChatSection /> {/* Main section - shows chats */}
+        {/* Input Area */}
+        {/* Extra Elements are to use DaisyUI */}
+        <div className="form-control w-full">
+          <div className="input-group flex">
+            <input type="text" placeholder="Type here" required className="input input-bordered grow" autoFocus ref={inputRef} onKeyDown={checkEnter} /> {/* Checks if user pressed enter - for send message on enter */}
+            <button className="btn btn-square" onClick={sendMessage}> {/* message is sent when pressed */}
+              <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-6 h-6 rotate-[-30deg]">
+                <path strokeLinecap="round" strokeLinejoin="round" d="M6 12L3.269 3.126A59.768 59.768 0 0121.485 12 59.77 59.77 0 013.27 20.876L5.999 12zm0 0h7.5" />
               </svg>
-              End-to-End Encrypted
-            </div>
-          </>
-      }
-    </div>
-  )
+            </button>
+          </div>
+        </div>
+      </div>
+    )
+  }
+  else {
+    return (
+      <div className="w-chat-screen-width h-screen flex flex-col border-l border-gray-700 max-sm:absolute max-sm:top-0 max-sm:left-0 max-sm:w-screen max-sm:-z-10">
+        <img src={dashboardDefault} alt="" className='h-1/2 w-1/2 mx-auto my-16' />
+        <div className='primary-content text-4xl text-center'>Chat Me Web</div>
+        <div className='text-gray-400 mx-auto flex w-fit my-16'>
+          <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-6 h-6">
+            <path strokeLinecap="round" strokeLinejoin="round" d="M16.5 10.5V6.75a4.5 4.5 0 10-9 0v3.75m-.75 11.25h10.5a2.25 2.25 0 002.25-2.25v-6.75a2.25 2.25 0 00-2.25-2.25H6.75a2.25 2.25 0 00-2.25 2.25v6.75a2.25 2.25 0 002.25 2.25z" />
+          </svg>
+          End-to-End Encrypted
+        </div>
+      </div>
+    )
+  }
 }

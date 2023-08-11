@@ -11,7 +11,7 @@ export default function Sidebar({ openDrawer }) {
   const [tab, setTab] = useState(0);
 
   return (
-    <div className="w-96 h-screen overflow-y-auto overflow-x-hidden flex flex-col">
+    <div className="w-96 h-screen overflow-y-auto overflow-x-hidden flex flex-col max-sm:w-screen bg-base-100">
       <UserCard openDrawer={openDrawer} online={true} obj={{ name, members: email, image }} />
       <Tabs tab={tab} setTab={setTab} />
       <Menu tab={tab} setTab={setTab} />

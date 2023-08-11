@@ -2,7 +2,7 @@ import { useToken } from "../../App";
 import { GoogleLogin } from '@react-oauth/google';
 import { useRef, useState } from "react";
 import { useFetch } from "../../api/useFetch";
-import loadingAnimation from '../../assets/loading.png';
+import loadingAnimation from '../../assets/loading.gif';
 
 
 /*
@@ -19,11 +19,9 @@ export default function Authentication() {
 
     return (
         <div>
-            <div className="navbar bg-base-100 absolute top-0">
-                <a className="btn btn-ghost normal-case text-xl">chatme</a>
-            </div>
-            <div className="flex w-screen h-screen justify-around items-center">
-                <img className="block rounded-full max-h-96 border-4 border-dashed" src="/favicon.jpg" alt="" />
+            <a className="btn btn-ghost normal-case text-xl fixed top-2 left-2">chatme</a>
+            <div className="flex max-w-screen justify-around items-center my-16 gap-12 flex-col md:flex-row md:h-screen md:my-0">
+                <img className="block rounded-full max-h-64 border-4 border-dashed md:max-h-96" src="/favicon.jpg" alt="" />
                 <div className="rounded-2xl bg-base-300 p-5 flex flex-col items-center">
                     <div className="text-3xl mb-8">Sign In with Google</div>
                     {
