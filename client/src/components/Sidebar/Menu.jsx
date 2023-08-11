@@ -30,7 +30,7 @@ export default function Menu({ tab, setTab }) {
         if (roomContact && roomContact.name) name = roomContact.name;
         if (roomContact && roomContact.image) image = roomContact.image;
         const lastChat = roomChat[roomChat.length - 1];
-        chatMenu.push(<ChatCard index={room} name={name} img={image} lastChat={lastChat.msg} />)
+        chatMenu.push(<ChatCard index={room} name={name} img={image} lastChat={lastChat.msg} key={room} />)
     }
 
     async function saveContact(e) {
@@ -88,7 +88,7 @@ export default function Menu({ tab, setTab }) {
             </div>),
         (contacts.length !== 0 ?
             contacts.map(room => {
-                return (<ChatCard index={room.email} name={room.name} img={room.image} lastChat={room.email} setTab={setTab} />)
+                return (<ChatCard index={room.email} name={room.name} img={room.image} lastChat={room.email} setTab={setTab} key={room.email} />)
             }) :
             <div className="h-full flex flex-col justify-center">
                 <img src={notFound} alt="" className="block h-64" />
